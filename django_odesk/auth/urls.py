@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
+from django_odesk.views import AuthenticateView, CallBackView
 
 urlpatterns = patterns('django_odesk.auth.views',
-    url(r'^authenticate/$', 'authenticate'),
-    url(r'^callback/$', 'callback'),
+    url(r'^authenticate/$', AuthenticateView.as_view()),
+    url(r'^callback/$', CallBackView.as_view()),
 )
