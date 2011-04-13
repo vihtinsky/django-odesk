@@ -16,21 +16,26 @@ def callback(request, redirect_url=None):
     odesk_client = DefaultClient()
     frob = request.GET.get('frob', None)
     if frob:
-        token, auth_user = odesk_client.auth.get_token(frob)
+        try:
+            token, auth_user = odesk_client.auth.get_token(frob)
+        except:
+            if not redirect_url:
+                redirect_url =  '/'
+            return HttpResponseRedirect(redirect_url)
         request.session[ODESK_TOKEN_SESSION_KEY] = token
         #TODO: Get rid of (conceptually correct) additional request to odesk.com
         user = django_authenticate(token = token)
         if user:
             login(request, user)
         else:
-            pass 
+            pass
             #Probably the odesk auth backend is missing. Should we raise an error?
-        redirect_url = request.session.pop(ODESK_REDIRECT_SESSION_KEY, 
+        redirect_url = request.session.pop(ODESK_REDIRECT_SESSION_KEY,
                                            redirect_url)
         if not redirect_url:
-            redirect_url =  '/'   
+            redirect_url =  '/'
         return HttpResponseRedirect(redirect_url)
-    
+
     else:
         return HttpResponseRedirect(odesk_client.auth.auth_url())
-    
+
